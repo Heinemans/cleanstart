@@ -1,0 +1,26 @@
+{
+  "name": "cleanstart",
+  "version": "1.1.0",
+  "description": "Rental Management System with Next.js Frontend and Express Backend",
+  "scripts": {
+    "install-all": "cd backend && npm install && cd ../frontend && npm install",
+    "start-backend": "cd backend && npm run dev",
+    "start-frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run start-backend\" \"npm run start-frontend\"",
+    "build": "next build",
+    "start": "next start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "@radix-ui/react-tabs": "^1.1.4",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.488.0",
+    "next": "14.2.0",
+    "react": "18.2.0",
+    "tailwind-merge": "^3.2.0",
+    "tailwindcss": "^3.4.1"
+  }
+}
