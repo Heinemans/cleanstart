@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { rentalPeriodSchema, RentalPeriodFormValues } from "@/types/formSchemas";
 
 // Function to calculate difference in days (inclusive of start and end dates)
 function calculateDaysDifference(startDate: Date | null, endDate: Date | null): number {
@@ -41,18 +42,7 @@ function calculateEndDate(startDate: Date, numberOfDays: number): Date {
   return endDate;
 }
 
-// Create the schema
-const formSchema = z.object({
-  start_date: z.date({
-    required_error: "Startdatum is verplicht",
-  }),
-  end_date: z.date({
-    required_error: "Einddatum is verplicht",
-  }),
-  days: z.coerce.number().min(1, "Minimaal 1 dag"),
-});
-
-type RentalPeriodFormValues = z.infer<typeof formSchema>;
+const formSchema = rentalPeriodSchema;
 
 interface RentalPeriodBlockProps {
   value?: Partial<RentalPeriodFormValues>;
@@ -295,90 +285,71 @@ export default function RentalPeriodBlock({ value = {}, onChange }: RentalPeriod
   }, [value, form]);
 
   return (
-    <div className="space-y-4 rounded-md border p-4 shadow-sm bg-white">
-      <h2 className="text-lg font-semibold">Verhuurperiode</h2>
-
+    <div className="rounded-md border p-6 shadow-sm bg-white">
+      <h2 className="text-lg font-semibold mb-6">Verhuurperiode</h2>
       <Form {...form}>
-        <form className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FormField
-              control={form.control}
-              name="start_date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Startdatum</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="date" 
-                      value={field.value ? (field.value as Date).toISOString().split('T')[0] : ''} 
-                      onChange={(e) => {
-                        const date = e.target.value ? new Date(e.target.value) : null;
-                        handleStartDateChange(date);
-                      }}
-                      onBlur={() => validateField("start_date")}
-                      className={errors.start_date ? "border-red-500" : ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                  {errors.start_date && (
-                    <p className="text-xs text-red-500 mt-1">{errors.start_date}</p>
-                  )}
-                </FormItem>
+        <form className="space-y-6">
+          <div className="flex flex-wrap gap-6">
+            {/* Startdatum */}
+            <div className="flex flex-col">
+              <FormLabel htmlFor="start_date">Startdatum</FormLabel>
+              <Input
+                type="date"
+                id="start_date"
+                name="start_date"
+                value={form.getValues("start_date") ? new Date(form.getValues("start_date")).toISOString().split('T')[0] : ''}
+                onChange={(e) => {
+                  const date = new Date(e.target.value);
+                  handleStartDateChange(date);
+                }}
+                onBlur={() => validateField("start_date")}
+                className={errors.start_date ? "border-red-500" : ""}
+              />
+              {errors.start_date && (
+                <p className="text-xs text-red-500 mt-1">{errors.start_date}</p>
               )}
-            />
+            </div>
 
-            <FormField
-              control={form.control}
-              name="end_date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Einddatum</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="date" 
-                      value={field.value ? (field.value as Date).toISOString().split('T')[0] : ''} 
-                      onChange={(e) => {
-                        const date = e.target.value ? new Date(e.target.value) : null;
-                        handleEndDateChange(date);
-                      }}
-                      onBlur={() => validateField("end_date")}
-                      className={errors.end_date ? "border-red-500" : ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                  {errors.end_date && (
-                    <p className="text-xs text-red-500 mt-1">{errors.end_date}</p>
-                  )}
-                </FormItem>
+            {/* Einddatum */}
+            <div className="flex flex-col">
+              <FormLabel htmlFor="end_date">Einddatum</FormLabel>
+              <Input
+                type="date"
+                id="end_date"
+                name="end_date"
+                value={form.getValues("end_date") ? new Date(form.getValues("end_date")).toISOString().split('T')[0] : ''}
+                onChange={(e) => {
+                  const date = new Date(e.target.value);
+                  handleEndDateChange(date);
+                }}
+                onBlur={() => validateField("end_date")}
+                className={errors.end_date ? "border-red-500" : ""}
+              />
+              {errors.end_date && (
+                <p className="text-xs text-red-500 mt-1">{errors.end_date}</p>
               )}
-            />
+            </div>
 
-            <FormField
-              control={form.control}
-              name="days"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Aantal dagen</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number"
-                      min="1"
-                      value={field.value}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value);
-                        handleDaysChange(value || 1);
-                      }}
-                      onBlur={() => validateField("days")}
-                      className={errors.days ? "border-red-500" : ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                  {errors.days && (
-                    <p className="text-xs text-red-500 mt-1">{errors.days}</p>
-                  )}
-                </FormItem>
+            {/* Aantal dagen */}
+            <div className="flex flex-col">
+              <FormLabel htmlFor="days">Aantal dagen</FormLabel>
+              <Input
+                type="number"
+                id="days"
+                name="days"
+                min={1}
+                className={`w-[120px] ${errors.days ? "border-red-500" : ""}`}
+                value={form.getValues("days")}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value);
+                  handleDaysChange(value || 1);
+                }}
+                onBlur={() => validateField("days")}
+              />
+              {errors.days && (
+                <p className="text-xs text-red-500 mt-1">{errors.days}</p>
               )}
-            />
+            </div>
           </div>
         </form>
       </Form>
